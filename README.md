@@ -1,1 +1,1 @@
-# LoyaltyRewardsProgram
+The LoyaltyRewardsProgram repository contains the main JavaScript file crucial for managing frontend interactions and user events. This project is designed to facilitate the functioning of a loyalty rewards program, ensuring a seamless and interactive user experience for participants. It focuses on handling user inputs, responses to rewards challenges, and maintaining an engaging and responsive interface for users to track and redeem their loyalty points.
