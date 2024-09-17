@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  loyalty_rewards_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - INFURA_KEY=YOUR_INFURA_KEY
+      - MNEMONIC=YOUR_MNEMONIC
