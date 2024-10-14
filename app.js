@@ -10,23 +10,39 @@ function onButtonClick(event) {
 }
 
 function setupEventListeners() {
-    const form = document.querySelector('#myForm');
-    if (form) {
-        form.addEventListener('submit', onFormSubmission); 
-    }
+    try {
+        const form = document.querySelector('#myForm');
+        if (form) {
+            form.addEventListener('submit', onFormSubmission); 
+        } else {
+            console.warn('myForm element was not found.');
+        }
 
-    const button = document.querySelector('#myButton');
-    if (button) {
-        button.addEventListener('click', onButtonClick); 
+        const button = document.querySelector('#myButton');
+        if (button) {
+            button.addEventListener('click', onButtonClick); 
+        } else {
+            console.warn('myButton element was not found.');
+        }
+    } catch (error) {
+        console.error("Error setting up event listeners:", error.message);
     }
 }
 
 function initializeApplication() {
     console.log("Application initialization complete");
     setupEventListeners(); 
+    // Consider calling fetchAPIData here if you intend to fetch data on application start.
+    // fetchAPIData(); 
 }
 
-document.addEventListener('DOMContentLoaded', initializeApplication);
+document.addEventListener('DOMContentLoaded', (event) => {
+    try {
+        initializeApplication();
+    } catch (error) {
+        console.error("Failed to initialize application:", error.message);
+    }
+});
 
 async function fetchAPIData() {
     try {
@@ -37,6 +53,10 @@ async function fetchAPIData() {
         const data = await response.json(); 
         console.log(data); 
     } catch (error) {
-        console.error("Failed to fetch API data", error.message);
+        if (error.name === "TypeError") {
+            console.error("Network error or wrong URL", error.message);
+        } else {
+            console.error("Failed to fetch API data", error.message);
+        }
     }
 }
