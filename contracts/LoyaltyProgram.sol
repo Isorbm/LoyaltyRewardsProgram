@@ -2,36 +2,36 @@
 pragma solidity ^0.8.0;
 
 contract LoyaltyRewardsProgram {
-    address public contractOwner;
-    mapping(address => uint) public userTokenBalances;
+    address public owner;
+    mapping(address => uint) public balances;
 
-    event TokensAccrued(address indexed user, uint tokenAmount);
-    event TokensSpent(address indexed user, uint tokenAmount);
+    event TokensAccrued(address indexed user, uint amount);
+    event TokensRedeemed(address indexed user, uint amount);
 
-    modifier isContractOwner() {
-        require(msg.sender == contractOwner, "Restricted: Only the contract owner can perform this action.");
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Restricted: Only the contract owner can perform this action.");
         _;
     }
 
     constructor() {
-        contractOwner = msg.sender;
+        owner = msg.sender;
     }
 
-    function accrueTokensForUser(address user, uint tokenAmount) external isContractOwner {
-        require(user != address(0), "Error: Cannot accrue tokens to the zero address.");
-        require(tokenAmount > 0, "Error: Token amount should be greater than 0.");
-        userTokenBalances[user] += tokenAmount;
-        emit TokensAccrued(user, tokenAmount);
+    function addTokensToUser(address user, uint amount) external onlyOwner {
+        require(user != address(0), "Error: Cannot add tokens to the zero address.");
+        require(amount > 0, "Error: Amount should be greater than 0.");
+        balances[user] += amount;
+        emit TokensAccrued(user, amount);
     }
 
-    function spendTokens(uint tokenAmount) external {
-        require(tokenAmount > 0, "Error: Token amount should be greater than 0.");
-        require(userTokenBalances[msg.sender] >= tokenAmount, "Error: Insufficient token balance.");
-        userTokenBalances[msg.sender] -= tokenAmount;
-        emit TokensSpent(msg.sender, tokenAmount);
+    function redeemTokens(uint amount) external {
+        require(amount > 0, "Error: Amount should be greater than 0.");
+        require(balances[msg.sender] >= amount, "Error: Insufficient token balance.");
+        balances[msg.sender] -= amount;
+        emit TokensRedeemed(msg.sender, amount);
     }
 
-    function getUserTokenBalance(address user) external view returns (uint) {
-        return userTokenBalances[user];
+    function getBalance(address user) external view returns (uint) {
+        return balances[user];
     }
 }
