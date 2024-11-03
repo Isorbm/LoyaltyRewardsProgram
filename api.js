@@ -22,7 +22,7 @@ const SmartContractAPI = {
             await tx.wait();
             console.log(`Successfully earned ${amount} reward`);
         } catch (error) {
-            console.error("Error earning reward: ", error);
+            SmartContractAPI.handleError(error, "earning reward");
         }
     },
 
@@ -32,7 +32,21 @@ const SmartContractAPI = {
             await tx.wait();
             console.log(`Successfully redeemed ${amount} reward`);
         } catch (error) {
-            console.error("Error redeeming reward: ", error);
+            SmartContractAPI.handleError(error, "redeeming reward");
+        }
+    },
+
+    handleError: (error, action) => {
+        if (error.code === 'NETWORK_ERROR') {
+            console.error(`Network error while ${action}: ${error.message}`);
+        } else if (error.code === 'UNSUPPORTED_OPERATION') {
+            console.error(`Unsupported operation while ${action}: ${error.message}`);
+        } else if (error instanceof ethers.errors.TransactionFailed) {
+            console.error(`Transaction failed while ${action}: ${error.transactionHash}`);
+        } else if (error.code === 'CALL_EXCEPTION') {
+            console.error(`Smart contract call exception while ${action}: ${error.message}`);
+        } else {
+            console.error(`Error ${action}:`, error);
         }
     }
 };
