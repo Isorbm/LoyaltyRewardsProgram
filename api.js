@@ -1,42 +1,42 @@
 require('dotenv').config();
 const ethers = require('ethers');
 
-const API_KEY = process.env.API_KEY;
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
-const PROVIDER = new ethers.providers.JsonRpcProvider(API_KEY);
+const blockchainNodeAPIKey = process.env.API_KEY;
+const walletPrivateKey = process.env.PRIVATE_KEY;
+const loyaltyContractAddress = process.env.CONTRACT_ADDRESS;
+const blockchainProvider = new ethers.providers.JsonRpcProvider(blockchainNodeAPIKey);
 
-const signer = new ethers.Wallet(PRIVATE_KEY, PROVIDER);
+const walletSigner = new ethers.Wallet(walletPrivateKey, blockchainProvider);
 
-const contractABI = [
+const loyaltyContractABI = [
     "function earnReward(uint256 amount) public",
     "function redeemReward(uint256 amount) public",
 ];
 
-const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, signer);
+const loyaltyRewardsContract = new ethers.Contract(loyaltyContractAddress, loyaltyContractABI, walletSigner);
 
-const SmartContractAPI = {
-    earnReward: async (amount) => {
+const LoyaltyRewardsAPI = {
+    awardPoints: async (points) => {
         try {
-            const tx = await contract.earnReward(amount);
-            await tx.wait();
-            console.log(`Successfully earned ${amount} reward`);
+            const transactionResponse = await loyaltyRewardsContract.earnReward(points);
+            await transactionResponse.wait();
+            console.log(`Successfully earned ${points} points`);
         } catch (error) {
-            SmartContractAPI.handleError(error, "earning reward");
+            LoyaltyRewardsAPI.handleTransactionError(error, "awarding points");
         }
     },
 
-    redeemReward: async (amount) => {
+    redeemPoints: async (points) => {
         try {
-            const tx = await contract.redeemReward(amount);
-            await tx.wait();
-            console.log(`Successfully redeemed ${amount} reward`);
+            const transactionResponse = await loyaltyRewardsContract.redeemReward(points);
+            await transactionResponse.wait();
+            console.log(`Successfully redeemed ${points} points`);
         } catch (error) {
-            SmartContractAPI.handleError(error, "redeeming reward");
+            LoyaltyRewardsAPI.handleTransactionError(error, "redeeming points");
         }
     },
 
-    handleError: (error, action) => {
+    handleTransactionError: (error, action) => {
         if (error.code === 'NETWORK_ERROR') {
             console.error(`Network error while ${action}: ${error.message}`);
         } else if (error.code === 'UNSUPPORTED_OPERATION') {
@@ -51,4 +51,4 @@ const SmartContractAPI = {
     }
 };
 
-module.exports = SmartContractAPI;
+module.exports = LoyaltyRewardsAPI;
