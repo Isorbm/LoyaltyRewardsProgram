@@ -30,33 +30,38 @@ function setupEventListeners() {
 }
 
 function initializeApplication() {
-    console.log("Application initialization complete");
-    setupEventListeners(); 
-    // Consider calling fetchAPIData here if you intend to fetch data on application start.
-    // fetchAPIData(); 
+    try {
+        console.log("Application initialization complete");
+        setupEventListeners(); 
+    } catch (error) {
+        console.error("Failed to initialize application:", error.message);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {
     try {
         initializeApplication();
     } catch (error) {
-        console.error("Failed to initialize application:", error.message);
+        console.error("Failed to initialize application on DOMContentLoaded:", error.message);
     }
 });
 
 async function fetchAPIData() {
+    const url = `https://api.example.com/data?key=${API_KEY}`;
     try {
-        const response = await fetch(`https://api.example.com/data?key=${API_KEY}`);
+        const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`API call failed with status: ${response.status}`);
         }
         const data = await response.json(); 
         console.log(data); 
     } catch (error) {
-        if (error.name === "TypeError") {
-            console.error("Network error or wrong URL", error.message);
+        if (error instanceof TypeError) {
+            console.error("Network error or wrong URL:", error.message);
+        } else if (error.message.includes('API call failed with status')) {
+            console.error("API call failed:", error.message);
         } else {
-            console.error("Failed to fetch API data", error.message);
+            console.error("Unexpected error during fetchAPI:", error.message);
         }
     }
 }
